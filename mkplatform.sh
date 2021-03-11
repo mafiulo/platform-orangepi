@@ -5,7 +5,7 @@ set -eo pipefail
 ver="${1:-lite}"
 
 C=$(pwd)
-A=../../armbian
+A=../armbian
 P="orangepi${ver}"
 B=current
 # Make sure we grab the right version
@@ -14,6 +14,10 @@ ARMBIAN_VERSION=$(cat ${A}/VERSION)
 # Shouldn't be needed anymore
 # cp kernel-sunxi-legacy.patch ${A}/userpatches/kernel/sunxi-legacy/
 # cp ${A}/config/kernel/linux-sunxi-legacy.config ${A}/userpatches
+
+# just to add patched version of wm8804.c driver
+cp kernel-sunxi-current.patch ${A}/userpatches/kernel/sunxi-current/
+
 cd ${A}
 ARMBIAN_HASH=$(git rev-parse --short HEAD)
 echo "Building for OrangePi ${ver} -- with Armbian ${ARMBIAN_VERSION} -- $B"
@@ -49,7 +53,7 @@ rm -rf "${P:?}/usr" "${P:?}/etc"
 for dts in "${C}"/overlays/*.dts; do
   dts_file=${dts%%.*}
   echo "Compiling ${dts_file}"
-  dtc -O dtb -o "${dts_file}.dts" "${dts_file}.dtbo"
+  dtc -O dtb -o "${dts_file}.dtbo" "${dts_file}.dts"
   cp "${dts_file}".{dts,dtbo} "${P}"/boot/overlay-user
 done
 
@@ -70,10 +74,13 @@ overlay_prefix=sun8i-h3
 overlays=${overlays[@]}
 rootdev=/dev/mmcblk0p2
 rootfstype=ext4
-user_overlays=sun8i-h3-i2s0
+user_overlays=ali_pifi_wm8804-i2c
 usbstoragequirks=0x2537:0x1066:u,0x2537:0x1068:u
 extraargs=imgpart=/dev/mmcblk0p2 imgfile=/volumio_current.sqsh
 EOF
+
+read -p " Check or maybe edit armbianEnv.txt and when finished press any key"  
+
 
 echo "Creating device tarball.."
 tar cJf "${P}_${B}.tar.xz" "$P"
