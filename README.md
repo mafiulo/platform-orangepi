@@ -26,6 +26,14 @@ git clone https://github.com/armbian/build ../armbian
 ```
 
 ## Changelog
+
+12 Mar 21
+- add patch for wm8804.c driver to make it work in software mode  as master. TESTED
+- add dts file for aliexpress pifi wm8804 hat.
+  |- in dts file disabled internal HDMI audio to make tests easier , not to confuse outputs.
+- TESTED with kernel 5.10. 
+
+
 24 Jan 19
 - update to armbian build 4.19.17
 
